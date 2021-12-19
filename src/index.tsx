@@ -2,14 +2,27 @@ import React from "react";
 import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
+
+import { BrowserRouter } from "react-router-dom";
+
 import reportWebVitals from "./reportWebVitals";
 import { MoralisProvider } from "react-moralis";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+
+const appID = process.env.REACT_APP_MORALIS_APPLICATION_ID as string;
+const serverUrl = process.env.REACT_APP_MORALIS_SERVER_URL as string;
+
+const theme = createTheme();
 
 ReactDOM.render(
   <React.StrictMode>
-    <MoralisProvider appId="xxxxxxxx" serverUrl="xxxxxxxx">
-      <App />
-    </MoralisProvider>
+    <ThemeProvider theme={theme}>
+      <MoralisProvider appId={appID} serverUrl={serverUrl}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </MoralisProvider>
+    </ThemeProvider>
   </React.StrictMode>,
   document.getElementById("root")
 );
