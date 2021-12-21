@@ -8,6 +8,7 @@ import { BrowserRouter } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
 import { MoralisProvider } from "react-moralis";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { Provider } from "react-redux";
 
 const appID = process.env.REACT_APP_MORALIS_APPLICATION_ID as string;
 const serverUrl = process.env.REACT_APP_MORALIS_SERVER_URL as string;

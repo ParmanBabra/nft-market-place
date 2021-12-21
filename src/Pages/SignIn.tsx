@@ -32,7 +32,7 @@ function Copyright(props: any) {
 }
 
 export default function SignInSide() {
-  const { authenticate, isAuthenticated, user } = useMoralis();
+  const { authenticate } = useMoralis();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

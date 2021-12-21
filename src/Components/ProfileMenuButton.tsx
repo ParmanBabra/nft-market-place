@@ -1,5 +1,4 @@
 import * as React from "react";
-import Button from "@mui/material/Button";
 import ClickAwayListener from "@mui/material/ClickAwayListener";
 import Grow from "@mui/material/Grow";
 import Paper from "@mui/material/Paper";
@@ -43,7 +42,7 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 
 export default function ProfileMenuButton() {
-  const { isAuthenticated, logout } = useMoralis();
+  const { logout } = useMoralis();
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLButtonElement>(null);
 
