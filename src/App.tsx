@@ -89,7 +89,7 @@ function App() {
   }
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box component="div" sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar position="absolute" open={open}>
         <Toolbar
