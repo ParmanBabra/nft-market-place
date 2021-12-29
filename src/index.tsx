@@ -8,6 +8,7 @@ import { BrowserRouter } from "react-router-dom";
 import reportWebVitals from "./reportWebVitals";
 import { MoralisProvider } from "react-moralis";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { store } from "./app/store";
 import { Provider } from "react-redux";
 
 const appID = process.env.REACT_APP_MORALIS_APPLICATION_ID as string;
@@ -20,7 +21,9 @@ ReactDOM.render(
     <ThemeProvider theme={theme}>
       <MoralisProvider appId={appID} serverUrl={serverUrl}>
         <BrowserRouter>
-          <App />
+          <Provider store={store}>
+            <App />
+          </Provider>
         </BrowserRouter>
       </MoralisProvider>
     </ThemeProvider>

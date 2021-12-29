@@ -2,9 +2,9 @@ import * as React from "react";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 
-import StatusRadar from "./../Components/StatusRadar";
-import CharacterStatusForm from "./../Components/CharacterStatusForm";
-import Character3DView from "../Components/Character3DView";
+import StatusRadar from "./StatusRadar";
+import CharacterStatusForm from "./CharacterStatusForm";
+import Character3DView from "./Character3DView";
 
 import "./Mint.css";
 import Button from "@mui/material/Button";

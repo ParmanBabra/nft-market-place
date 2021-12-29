@@ -20,11 +20,11 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 
-import ProfileMenuButton from "./Components/ProfileMenuButton";
+import ProfileMenuButton from "./features/sing-in/ProfileMenuButton";
 
-import SignIn from "./Pages/SignIn";
-import Maketplace from "./Pages/Maketplace";
-import Mint from "./Pages/Mint";
+import SignIn from "./features/sing-in/SignIn";
+import Maketplace from "./features/market-place/Maketplace";
+import Mint from "./features/mint/Mint";
 import { useMoralis } from "react-moralis";
 
 const drawerWidth: number = 240;
