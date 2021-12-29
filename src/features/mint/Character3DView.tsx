@@ -5,7 +5,16 @@ import { Canvas } from "@react-three/fiber";
 
 import { OrbitControls, Stage, useGLTF } from "@react-three/drei";
 import { GLTFResult } from "./models/GLTFModel";
-import { Group, Material, Mesh, Object3D, Side } from "three";
+import {
+  Group,
+  Material,
+  Mesh,
+  Object3D,
+  Side,
+  DoubleSide,
+  BackSide,
+  FrontSide,
+} from "three";
 import PropTypes from "prop-types";
 
 function Stand() {
@@ -48,8 +57,8 @@ function RecursiveModel({ obj }: RecursiveModelProps): JSX.Element {
     );
   } else if (obj.type === "Mesh") {
     const mesh = obj as Mesh;
-    const mat = mesh.material as Material;
-    mat.side = 2;
+    const material = mesh.material as Material;
+    material.side = DoubleSide;
     console.log(mesh.material);
     return (
       <mesh
@@ -58,8 +67,9 @@ function RecursiveModel({ obj }: RecursiveModelProps): JSX.Element {
         castShadow
         receiveShadow
         geometry={mesh.geometry}
-        material={mat}
+        material={material}
         position={[0, 0, 0]}
+        scale={[1, 1, -1]}
       ></mesh>
     );
   } else {
