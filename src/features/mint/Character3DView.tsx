@@ -118,7 +118,7 @@ export default function Character3DView() {
             <SimpleModel />
           </Stage>
         </Suspense>
-        <OrbitControls ref={ref} autoRotate />
+        <OrbitControls ref={ref} regress />
       </Canvas>
     </React.Fragment>
   );
