@@ -1,27 +1,21 @@
-import React, { Suspense, useRef } from "react";
+import React, { Suspense, useEffect, useRef } from "react";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import { Canvas } from "@react-three/fiber";
 
-import { OrbitControls, Stage, useGLTF } from "@react-three/drei";
-import { GLTFResult } from "./models/GLTFModel";
 import {
-  Group,
-  Material,
-  Mesh,
-  Object3D,
-  Side,
-  DoubleSide,
-  BackSide,
-  FrontSide,
-} from "three";
-import PropTypes from "prop-types";
+  OrbitControls,
+  Stage,
+  useAnimations,
+  useGLTF,
+} from "@react-three/drei";
+import { getChibi, getNormal } from "./MintSlice";
+import { GLTFResult } from "./models/GLTFModel";
+import { useAppSelector } from "../../app/hooks";
 
 function Stand() {
   const group = useRef();
   const { nodes, materials } = useGLTF("/assets/models/Stand.glb") as any;
-
-  console.log(materials);
 
   return (
     <React.Fragment>
@@ -38,75 +32,47 @@ function Stand() {
   );
 }
 
-interface RecursiveModelProps {
-  obj: Object3D;
-}
+type SimpleModelProps = {
+  url: string;
+};
 
-function RecursiveModel({ obj }: RecursiveModelProps): JSX.Element {
-  const ref = useRef();
-
-  if (obj.type === "Group") {
-    const group = obj as Group;
-    const children = group.children.map((x) => {
-      return <RecursiveModel obj={x} />;
-    });
-    return (
-      <group key={obj.uuid} ref={ref}>
-        {children}
-      </group>
-    );
-  } else if (obj.type === "Mesh") {
-    const mesh = obj as Mesh;
-    const material = mesh.material as Material;
-    material.side = DoubleSide;
-    console.log(mesh.material);
-    return (
-      <mesh
-        key={obj.uuid}
-        ref={ref}
-        castShadow
-        receiveShadow
-        geometry={mesh.geometry}
-        material={material}
-        position={[0, 0, 0]}
-        scale={[1, 1, -1]}
-      ></mesh>
-    );
-  } else {
-    console.log("Unknow Type ");
-    return <React.Fragment></React.Fragment>;
-  }
-}
-
-function SimpleModel() {
+function SimpleModel({ url }: SimpleModelProps) {
   const group = useRef();
-  const { scene } = useGLTF("/assets/models/Jean.glb") as GLTFResult;
+  const { scene, animations } = useGLTF(url) as GLTFResult;
+  const { mixer, clips } = useAnimations(animations, group);
 
-  console.log(scene);
+  const idle = mixer.clipAction(clips[0], scene);
+
+  useEffect(() => {
+    idle.play();
+  });
 
   return (
     <React.Fragment>
-      <RecursiveModel obj={scene} />
+      <primitive key={scene.uuid} object={scene} />
     </React.Fragment>
   );
 }
 
 export default function Character3DView() {
-  const [value, setValue] = React.useState("normal");
+  const [viewType, setViewType] = React.useState("normal");
   const ref = useRef() as any;
 
+  const normal = useAppSelector(getNormal);
+  const chibi = useAppSelector(getChibi);
+
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-    setValue(newValue);
+    setViewType(newValue);
   };
 
   return (
     <React.Fragment>
-      <Tabs value={value} onChange={handleChange}>
+      <Tabs value={viewType} onChange={handleChange}>
         <Tab value="normal" label="Normal" />
         <Tab value="chibi" label="Chibi" />
       </Tabs>
 
-      <Canvas shadows dpr={[1, 2]} camera={{ fov: 50 }}>
+      <Canvas shadows dpr={[1, 2]} camera={{ fov: 70 }}>
         <Suspense fallback={null}>
           <Stage
             controls={ref}
@@ -115,7 +81,9 @@ export default function Character3DView() {
             environment="city"
           >
             <Stand />
-            <SimpleModel />
+            {viewType === "normal"
+              ? normal && <SimpleModel url={normal} />
+              : chibi && <SimpleModel url={chibi} />}
           </Stage>
         </Suspense>
         <OrbitControls ref={ref} regress />

@@ -9,29 +9,6 @@ import Character3DView from "./Character3DView";
 import "./Mint.css";
 import Button from "@mui/material/Button";
 
-const data: any = [
-  {
-    status: "Strength",
-    value: 7,
-  },
-  {
-    status: "Agility",
-    value: 10,
-  },
-  {
-    status: "Vitality",
-    value: 6,
-  },
-  {
-    status: "Intelligence",
-    value: 5,
-  },
-  {
-    status: "Dexterity",
-    value: 2,
-  },
-];
-
 export default function Maketplace() {
   return (
     <React.StrictMode>
@@ -60,7 +37,7 @@ export default function Maketplace() {
               height: 500,
             }}
           >
-            <StatusRadar data={data} />
+            <StatusRadar></StatusRadar>
           </Paper>
         </div>
         <div>
@@ -69,7 +46,9 @@ export default function Maketplace() {
           </Paper>
         </div>
         <div className="grid-buttons">
-          <Button variant="contained" size="large" className="button">Mint</Button>
+          <Button variant="contained" size="large" className="button">
+            Mint
+          </Button>
         </div>
       </div>
     </React.StrictMode>

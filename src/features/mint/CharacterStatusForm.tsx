@@ -2,102 +2,210 @@ import * as React from "react";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
-import TextField from "@mui/material/TextField";
 import Input from "@mui/material/Input";
-import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
-import Slider from "@mui/material/Slider";
 import Rating from "@mui/material/Rating";
 import Badge from "@mui/material/Badge";
-import Divider from '@mui/material/Divider';
-import UploadFile from "@mui/icons-material/UploadFile";
+import Divider from "@mui/material/Divider";
+import Stack from "@mui/material/Stack";
+import { UploadFile, Add, Remove } from "@mui/icons-material";
+
+import { useAppSelector, useAppDispatch } from "../../app/hooks";
+import {
+  incrementStrength,
+  decrementStrength,
+  decrementAgility,
+  incrementAgility,
+  decrementDexterity,
+  incrementDexterity,
+  decrementIntelligence,
+  incrementIntelligence,
+  decrementVitality,
+  incrementVitality,
+  updateStar,
+  updateNormalFile,
+  updateChibiFile,
+  getStatus,
+  getStatusPoint,
+  getStar,
+} from "./MintSlice";
 
 type Props = {
   title: string;
+  value?: number;
+  onAdd?: () => {};
+  onRemove?: () => {};
 };
 
-function StatusSlider({ title }: Props) {
+function StatusAttribute({
+  title,
+  value = undefined,
+  onAdd = undefined,
+  onRemove = undefined,
+}: Props) {
   return (
     <React.Fragment>
       <Grid item sm={2}>
-        <Typography component="label">{title}</Typography>
+        <Typography component="label" align="center">
+          {title}
+        </Typography>
       </Grid>
       <Grid item sm={10}>
-        <Slider
-          aria-label="{title}"
-          defaultValue={0}
-          valueLabelDisplay="auto"
-          step={1}
-          marks
-          min={1}
-          max={10}
-        />
+        <Box
+          component="div"
+          style={{ border: "1px solid grey", display: "inline-flex" }}
+        >
+          <Stack direction="row" spacing="1">
+            <IconButton aria-label="add" color="primary" onClick={onRemove}>
+              <Remove />
+            </IconButton>
+            <Box component="span" sx={{ p: 1 }}>
+              {value}
+            </Box>
+            <IconButton aria-label="add" color="primary" onClick={onAdd}>
+              <Add />
+            </IconButton>
+          </Stack>
+        </Box>
       </Grid>
     </React.Fragment>
   );
 }
 
 export default function CharacterStatusForm() {
+  const normalInputRef = React.useRef<any>();
+  const chibiInputRef = React.useRef<any>();
+
+  const [normalName, setNormalName] = React.useState<string>();
+  const [chibiName, setChibiName] = React.useState<string>();
+
+  const status = useAppSelector(getStatus);
+  const statusPoint = useAppSelector(getStatusPoint);
+  const star = useAppSelector(getStar);
+
+  const dispatch = useAppDispatch();
+
+  console.log(normalInputRef);
+
   return (
     <React.Fragment>
       <Box component="form" noValidate sx={{ mt: 3 }}>
-
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
-            <Input type="file" style={{ display: "none" }} />
-            <TextField
-              name="normalModel"
-              required
-              fullWidth
-              id="normalModelUpload"
-              label="Normal Model"
-              autoFocus
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton edge="end">
-                      <UploadFile />
-                    </IconButton>
-                  </InputAdornment>
-                ),
+            <Input
+              inputRef={normalInputRef}
+              type="file"
+              style={{ display: "none" }}
+              onChange={(event) => {
+                const target = event.currentTarget as HTMLInputElement;
+
+                if (!target.files) return;
+
+                const file = target.files?.item(0) as File;
+                const fileUrl = URL.createObjectURL(file);
+                dispatch(updateNormalFile(fileUrl));
+                setNormalName(file.name);
               }}
             />
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ p: 1, border: "1px solid grey", borderRadius: "3px" }}
+            >
+              <Typography variant="body2" sx={{ p: 1 }}>
+                {normalName ? normalName : "Normal Model"}
+              </Typography>
+              <IconButton
+                edge="end"
+                onClick={() => normalInputRef.current.click()}
+              >
+                <UploadFile />
+              </IconButton>
+            </Stack>
           </Grid>
           <Grid item xs={12} sm={6}>
-            <Input type="file" style={{ display: "none" }} />
-            <TextField
-              name="chibiModel"
-              required
-              fullWidth
-              id="chibiModelUpload"
-              label="Chibi Model"
-              autoFocus
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton edge="end">
-                      <UploadFile />
-                    </IconButton>
-                  </InputAdornment>
-                ),
+            <Input
+              inputRef={chibiInputRef}
+              type="file"
+              style={{ display: "none" }}
+              onClick={() => chibiInputRef.current.click()}
+              onChange={(event) => {
+                const target = event.currentTarget as HTMLInputElement;
+
+                if (!target.files) return;
+
+                const file = target.files?.item(0) as File;
+                const fileUrl = URL.createObjectURL(file);
+                dispatch(updateChibiFile(fileUrl));
+                setChibiName(file.name);
               }}
             />
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ p: 1, border: "1px solid grey", borderRadius: "3px" }}
+            >
+              <Typography variant="body2" sx={{ p: 1 }}>
+                {chibiName ? chibiName : "Chibi Model"}
+              </Typography>
+              <IconButton
+                edge="end"
+                onClick={() => chibiInputRef.current.click()}
+              >
+                <UploadFile />
+              </IconButton>
+            </Stack>
           </Grid>
           <Divider />
           <Grid item sm={2}>
             <Typography component="label">Stars</Typography>
           </Grid>
           <Grid item sm={10}>
-            <Badge color="primary" badgeContent={10}>
-              <Rating name="star" size="large" />
+            <Badge color="primary" badgeContent={statusPoint}>
+              <Rating
+                name="star"
+                size="large"
+                value={star}
+                onChange={(event, value) => {
+                  const newValue = value as number;
+                  dispatch(updateStar(newValue));
+                }}
+              />
             </Badge>
           </Grid>
 
-          <StatusSlider title="Strength" />
-          <StatusSlider title="Agility" />
-          <StatusSlider title="Vitality" />
-          <StatusSlider title="Intelligence" />
-          <StatusSlider title="Dexterity" />
+          <StatusAttribute
+            title="Strength"
+            value={status.strength}
+            onAdd={() => dispatch(incrementStrength())}
+            onRemove={() => dispatch(decrementStrength())}
+          />
+          <StatusAttribute
+            title="Agility"
+            value={status.agility}
+            onAdd={() => dispatch(incrementAgility())}
+            onRemove={() => dispatch(decrementAgility())}
+          />
+          <StatusAttribute
+            title="Vitality"
+            value={status.vitality}
+            onAdd={() => dispatch(incrementVitality())}
+            onRemove={() => dispatch(decrementVitality())}
+          />
+          <StatusAttribute
+            title="Intelligence"
+            value={status.intelligence}
+            onAdd={() => dispatch(incrementIntelligence())}
+            onRemove={() => dispatch(decrementIntelligence())}
+          />
+          <StatusAttribute
+            title="Dexterity"
+            value={status.dexterity}
+            onAdd={() => dispatch(incrementDexterity())}
+            onRemove={() => dispatch(decrementDexterity())}
+          />
         </Grid>
       </Box>
     </React.Fragment>
