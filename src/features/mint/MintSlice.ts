@@ -200,16 +200,15 @@ export const getStatus = (state: RootState): IStatus => {
 export const mint =
   (amount: number): AppThunk =>
   async (dispatch, getState) => {
-    const currentState = getState();
-    if (!currentState.mint.normal) return;
+    const { mint } = getState();
+    if (!mint.normal) return;
 
-    if (!currentState.mint.chibi) return;
+    if (!mint.chibi) return;
+
+    const normal = await axios.get(mint.normal);
+    const chibi = await axios.get(mint.chibi);
+
     
-    const normal = await axios.get(currentState.mint.normal);
-    const chibi = await axios.get(currentState.mint.chibi);
-
-    console.log(normal.data);
-    console.log(chibi.data);
   };
 
 export default mintSlice.reducer;
