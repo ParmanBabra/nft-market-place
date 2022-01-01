@@ -1,5 +1,7 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { RootState } from "../../app/store";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import axios from "axios";
+import Moralis from "moralis/types";
+import { AppThunk, RootState } from "../../app/store";
 
 export interface MintState {
   strength: number;
@@ -28,8 +30,8 @@ const initialState: MintState = {
   vitality: 1,
   intelligence: 1,
   dexterity: 1,
-  statusPoint: 10,
-  maxStatusPoint: 15,
+  statusPoint: 5,
+  maxStatusPoint: 10,
   star: 1,
 };
 
@@ -39,8 +41,7 @@ function getUsedStatusPoint(state: MintState): number {
     state.agility +
     state.dexterity +
     state.intelligence +
-    state.vitality -
-    5
+    state.vitality
   );
 }
 
@@ -61,11 +62,9 @@ export const mintSlice = createSlice({
   reducers: {
     updateNormalFile: (state, action: PayloadAction<string>) => {
       state.normal = action.payload;
-      console.log("updateNormalFile");
     },
     updateChibiFile: (state, action: PayloadAction<string>) => {
       state.chibi = action.payload;
-      console.log("updateChibiFile");
     },
     updateStar: (state, action: PayloadAction<number>) => {
       if (action.payload < 1) return;
@@ -187,7 +186,7 @@ export const getStar = (state: RootState) => state.mint.star;
 export const getNormal = (state: RootState) => state.mint.normal;
 export const getChibi = (state: RootState) => state.mint.chibi;
 
-export const getStatus = (state: RootState) => {
+export const getStatus = (state: RootState): IStatus => {
   const status: IStatus = {
     strength: state.mint.strength,
     agility: state.mint.agility,
@@ -197,5 +196,20 @@ export const getStatus = (state: RootState) => {
   };
   return status;
 };
+
+export const mint =
+  (amount: number): AppThunk =>
+  async (dispatch, getState) => {
+    const currentState = getState();
+    if (!currentState.mint.normal) return;
+
+    if (!currentState.mint.chibi) return;
+    
+    const normal = await axios.get(currentState.mint.normal);
+    const chibi = await axios.get(currentState.mint.chibi);
+
+    console.log(normal.data);
+    console.log(chibi.data);
+  };
 
 export default mintSlice.reducer;

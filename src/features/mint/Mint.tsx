@@ -9,7 +9,12 @@ import Character3DView from "./Character3DView";
 import "./Mint.css";
 import Button from "@mui/material/Button";
 
+import { useAppSelector, useAppDispatch } from "../../app/hooks";
+import { mint } from "./MintSlice";
+
 export default function Maketplace() {
+  const dispatch = useAppDispatch();
+
   return (
     <React.StrictMode>
       <Typography component="h1" variant="h2" align="center" gutterBottom>
@@ -46,7 +51,12 @@ export default function Maketplace() {
           </Paper>
         </div>
         <div className="grid-buttons">
-          <Button variant="contained" size="large" className="button">
+          <Button
+            variant="contained"
+            size="large"
+            className="button"
+            onClick={() => dispatch(mint(0))}
+          >
             Mint
           </Button>
         </div>
