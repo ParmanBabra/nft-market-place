@@ -1,9 +1,11 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import axios from "axios";
-import Moralis from "moralis/types";
+import Moralis from "moralis";
+import { Base64 } from "js-base64";
 import { AppThunk, RootState } from "../../app/store";
 
 export interface MintState {
+  name?: string;
+  description?: string;
   strength: number;
   agility: number;
   vitality: number;
@@ -12,8 +14,12 @@ export interface MintState {
   statusPoint: number;
   maxStatusPoint: number;
   star: number;
+  image?: string;
   chibi?: string;
   normal?: string;
+  imageFileName?: string;
+  chibiFileName?: string;
+  normalFileName?: string;
 }
 
 export interface IStatus {
@@ -22,6 +28,11 @@ export interface IStatus {
   vitality: number;
   intelligence: number;
   dexterity: number;
+}
+
+export interface IMintFile {
+  content: string;
+  fileName: string;
 }
 
 const initialState: MintState = {
@@ -60,11 +71,23 @@ export const mintSlice = createSlice({
   initialState,
   // The `reducers` field lets us define reducers and generate associated actions
   reducers: {
-    updateNormalFile: (state, action: PayloadAction<string>) => {
-      state.normal = action.payload;
+    updateName: (state, action: PayloadAction<string>) => {
+      state.name = action.payload;
     },
-    updateChibiFile: (state, action: PayloadAction<string>) => {
-      state.chibi = action.payload;
+    updateDescription: (state, action: PayloadAction<string>) => {
+      state.description = action.payload;
+    },
+    updateImageFile: (state, action: PayloadAction<IMintFile>) => {
+      state.image = action.payload.content;
+      state.imageFileName = action.payload.fileName;
+    },
+    updateNormalFile: (state, action: PayloadAction<IMintFile>) => {
+      state.normal = action.payload.content;
+      state.normalFileName = action.payload.fileName;
+    },
+    updateChibiFile: (state, action: PayloadAction<IMintFile>) => {
+      state.chibi = action.payload.content;
+      state.chibiFileName = action.payload.fileName;
     },
     updateStar: (state, action: PayloadAction<number>) => {
       if (action.payload < 1) return;
@@ -177,12 +200,16 @@ export const {
   decrementVitality,
   incrementVitality,
   updateStar,
+  updateImageFile,
   updateNormalFile,
   updateChibiFile,
+  updateName,
+  updateDescription,
 } = mintSlice.actions;
 
 export const getStatusPoint = (state: RootState) => state.mint.statusPoint;
 export const getStar = (state: RootState) => state.mint.star;
+export const getImage = (state: RootState) => state.mint.image;
 export const getNormal = (state: RootState) => state.mint.normal;
 export const getChibi = (state: RootState) => state.mint.chibi;
 
@@ -205,10 +232,71 @@ export const mint =
 
     if (!mint.chibi) return;
 
-    const normal = await axios.get(mint.normal);
-    const chibi = await axios.get(mint.chibi);
+    if (!mint.image) return;
 
-    
+    let imageFile = new Moralis.File(mint.imageFileName as string, {
+      uri: mint.image,
+    });
+    await imageFile.save();
+
+    let normalFile = new Moralis.File(mint.normalFileName as string, {
+      uri: mint.normal,
+    });
+    await normalFile.save();
+
+    let chibiFile = new Moralis.File(mint.chibiFileName as string, {
+      uri: mint.chibi,
+    });
+    await chibiFile.save();
+
+    let mata = {
+      name: mint.name,
+      description: mint.description,
+      image: imageFile.url(),
+      animation_url: normalFile.url(),
+      chbi_animation_url: chibiFile.url(),
+      star: mint.star,
+      strength: mint.strength,
+      dexterity: mint.dexterity,
+      agility: mint.agility,
+      intelligence: mint.intelligence,
+      vitality: mint.vitality,
+      attributes: [
+        {
+          trait_type: "Star",
+          value: mint.star,
+        },
+        {
+          trait_type: "Strength",
+          value: mint.strength,
+        },
+        {
+          trait_type: "Dexterity",
+          value: mint.dexterity,
+        },
+        {
+          trait_type: "Agility",
+          value: mint.agility,
+        },
+        {
+          trait_type: "Intelligence",
+          value: mint.intelligence,
+        },
+        {
+          trait_type: "Vitality",
+          value: mint.vitality,
+        },
+      ],
+    };
+    let jsonMata = JSON.stringify(mata);
+
+    let mataFile = new Moralis.File(`${mint.name}.json`, {
+      base64: Base64.btoa(jsonMata),
+    });
+
+    await mataFile.save();
+
+    console.log(mataFile);
   };
 
 export default mintSlice.reducer;

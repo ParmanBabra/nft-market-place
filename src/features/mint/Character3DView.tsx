@@ -4,6 +4,7 @@ import Tab from "@mui/material/Tab";
 import { Canvas } from "@react-three/fiber";
 
 import {
+  PerspectiveCamera,
   OrbitControls,
   Stage,
   useAnimations,
@@ -57,6 +58,7 @@ function SimpleModel({ url }: SimpleModelProps) {
 export default function Character3DView() {
   const [viewType, setViewType] = React.useState("normal");
   const ref = useRef() as any;
+  const virtualCamera = useRef<THREE.Camera>();
 
   const normal = useAppSelector(getNormal);
   const chibi = useAppSelector(getChibi);
@@ -72,7 +74,7 @@ export default function Character3DView() {
         <Tab value="chibi" label="Chibi" />
       </Tabs>
 
-      <Canvas shadows dpr={[1, 2]} camera={{ fov: 70 }}>
+      <Canvas>
         <Suspense fallback={null}>
           <Stage
             controls={ref}
@@ -85,8 +87,22 @@ export default function Character3DView() {
               ? normal && <SimpleModel url={normal} />
               : chibi && <SimpleModel url={chibi} />}
           </Stage>
+          <PerspectiveCamera
+            makeDefault
+            name="Main Camera"
+            ref={virtualCamera}
+            position={[100, 200, 1000]}
+          />
+          <OrbitControls
+            makeDefault
+            regress
+            ref={ref}
+            camera={virtualCamera.current}
+            enablePan={true}
+            enableZoom={true}
+            enableRotate={true}
+          />
         </Suspense>
-        <OrbitControls ref={ref} regress />
       </Canvas>
     </React.Fragment>
   );
