@@ -1,5 +1,6 @@
 import * as React from "react";
 import Grid from "@mui/material/Grid";
+import { Greeter } from "./../../contracts/Greeter";
 
 export default function Maketplace() {
   return (
